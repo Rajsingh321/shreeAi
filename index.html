@@ -1,11 +1,745 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>My Simple Webpage</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ShreeAI</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
 <body>
-    <h1>Welcome to my webpage!</h1>
-    <p>This is a basic paragraph of text.</p>
-    <p>You can add more content here.</p>
+    <!-- Logo and Sign Up -->
+    <div class="header">
+        <div class="logo">
+            <img src="logo.png" alt="ShreeAI Logo"
+             width="32" height="32">
+            <span>ShreeAI</span>
+        </div>
+        <button class="signup-btn" id="signupBtn">Sign up</button>
+        <div class="profile-menu" id="profileMenu" style="display: none;">
+            <button class="profile-btn" id="profileBtn">
+                <span class="profile-initial" id="profileInitial">U</span>
+                <span class="profile-name" id="profileName">User</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Sign Up Modal -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal">
+            <button class="modal-close" id="modalClose">&times;</button>
+            <h2 class="modal-title">Create your account</h2>
+            <p class="modal-subtitle">Join us to access AI services</p>
+            
+            <form class="signup-form" id="signupForm">
+                <div class="form-group">
+                    <label for="name">Full Name</label>
+                    <input type="text" id="name" placeholder="Enter your name" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" placeholder="you@example.com" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" placeholder="Create a password" required>
+                </div>
+                
+                <div class="form-group verification-group">
+                    <label for="code">Verification Code</label>
+                    <div class="code-input-wrapper">
+                        <input type="text" id="code" placeholder="Enter code" disabled required>
+                        <button type="button" class="get-code-btn" id="getCodeBtn">Get Code</button>
+                    </div>
+                    <span class="code-sent-msg" id="codeSentMsg">Code sent to your email!</span>
+                </div>
+                
+                <button type="submit" class="submit-btn" id="submitBtn" disabled>Submit</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="container">
+        <header class="hero">
+            <h1 class="hero-title">Revolutionize Your Business with AI Solutions</h1>
+            <p class="hero-subtitle">Harness the power of cutting-edge artificial intelligence to transform your workflow</p>
+        </header>
+
+        <!-- Services Grid -->
+            <!-- Service 1 -->
+            <div class="service-card">
+                <div class="video-wrapper">
+                    <video class="service-video" loading="lazy" muted loop playsinline>
+                        <source src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4" type="video/mp4">
+                    </video>
+                    <div class="play-overlay">
+                        <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
+                            <circle cx="24" cy="24" r="24" fill="rgba(0,0,0,0.7)"/>
+                            <path d="M20 16L32 24L20 32V16Z" fill="white"/>
+                        </svg>
+                    </div>
+                </div>
+                <div class="service-content">
+                    <h3 class="service-title">AI Content Generation</h3>
+                    <p class="service-description">Create high-quality content at scale with our advanced language models</p>
+                    <button class="cta-button">
+                        Try this Service
+                        <span class="button-arrow">→</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Service 2 -->
+            <div class="service-card">
+                <div class="video-wrapper">
+                    <video class="service-video" loading="lazy" muted loop playsinline>
+                        <source src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4" type="video/mp4">
+                    </video>
+                    <div class="play-overlay">
+                        <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
+                            <circle cx="24" cy="24" r="24" fill="rgba(0,0,0,0.7)"/>
+                            <path d="M20 16L32 24L20 32V16Z" fill="white"/>
+                        </svg>
+                    </div>
+                </div>
+                <div class="service-content">
+                    <h3 class="service-title">Image Recognition</h3>
+                    <p class="service-description">Analyze and classify images with unprecedented accuracy and speed</p>
+                    <button class="cta-button">
+                        Try this Service
+                        <span class="button-arrow">→</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Service 3 -->
+            <div class="service-card">
+                <div class="video-wrapper">
+                    <video class="service-video" loading="lazy" muted loop playsinline>
+                        <source src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4" type="video/mp4">
+                    </video>
+                    <div class="play-overlay">
+                        <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
+                            <circle cx="24" cy="24" r="24" fill="rgba(0,0,0,0.7)"/>
+                            <path d="M20 16L32 24L20 32V16Z" fill="white"/>
+                        </svg>
+                    </div>
+                </div>
+                <div class="service-content">
+                    <h3 class="service-title">Data Analytics</h3>
+                    <p class="service-description">Extract insights from complex datasets with intelligent automation</p>
+                    <button class="cta-button">
+                        Try this Service
+                        <span class="button-arrow">→</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Service 4 -->
+            <div class="service-card">
+                <div class="video-wrapper">
+                    <video class="service-video" loading="lazy" muted loop playsinline>
+                        <source src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4" type="video/mp4">
+                    </video>
+                    <div class="play-overlay">
+                        <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
+                            <circle cx="24" cy="24" r="24" fill="rgba(0,0,0,0.7)"/>
+                            <path d="M20 16L32 24L20 32V16Z" fill="white"/>
+                        </svg>
+                    </div>
+                </div>
+                <div class="service-content">
+                    <h3 class="service-title">Voice Synthesis</h3>
+                    <p class="service-description">Transform text into natural-sounding speech in multiple languages</p>
+                    <button class="cta-button">
+                        Try this Service
+                        <span class="button-arrow">→</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Service 5 -->
+            <div class="service-card">
+                <div class="video-wrapper">
+                    <video class="service-video" loading="lazy" muted loop playsinline>
+                        <source src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4" type="video/mp4">
+                    </video>
+                    <div class="play-overlay">
+                        <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
+                            <circle cx="24" cy="24" r="24" fill="rgba(0,0,0,0.7)"/>
+                            <path d="M20 16L32 24L20 32V16Z" fill="white"/>
+                        </svg>
+                    </div>
+                </div>
+                <div class="service-content">
+                    <h3 class="service-title">Predictive AI</h3>
+                    <p class="service-description">Forecast trends and outcomes with machine learning models</p>
+                    <button class="cta-button">
+                        Try this Service
+                        <span class="button-arrow">→</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #ffffff;
+            color: #1a1a1a;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 48px;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid #e5e5e5;
+            z-index: 1000;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 700;
+            font-size: 18px;
+            color: #1a1a1a;
+        }
+
+        .signup-btn {
+            padding: 10px 24px;
+            background: #000000;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: inherit;
+        }
+
+        .signup-btn:hover {
+            background: #2a2a2a;
+            transform: translateY(-1px);
+        }
+
+        .profile-menu {
+            display: flex;
+            align-items: center;
+        }
+
+        .profile-btn {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 6px 12px 6px 6px;
+            background: #f5f5f5;
+            border: 1px solid #e5e5e5;
+            border-radius: 24px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: inherit;
+        }
+
+        .profile-btn:hover {
+            background: #ebebeb;
+        }
+
+        .profile-initial {
+            width: 32px;
+            height: 32px;
+            background: #000000;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .profile-name {
+            font-weight: 600;
+            font-size: 14px;
+            color: #1a1a1a;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        .modal {
+            background: white;
+            border-radius: 16px;
+            padding: 40px;
+            width: 90%;
+            max-width: 440px;
+            position: relative;
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-overlay.active .modal {
+            transform: scale(1);
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            background: none;
+            border: none;
+            font-size: 32px;
+            color: #999;
+            cursor: pointer;
+            line-height: 1;
+            padding: 4px 8px;
+            transition: color 0.2s ease;
+        }
+
+        .modal-close:hover {
+            color: #1a1a1a;
+        }
+
+        .modal-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: #1a1a1a;
+        }
+
+        .modal-subtitle {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 32px;
+        }
+
+        .signup-form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-group label {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+
+        .form-group input {
+            padding: 12px 16px;
+            border: 1px solid #d1d1d1;
+            border-radius: 8px;
+            font-size: 15px;
+            font-family: inherit;
+            transition: all 0.2s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #1a1a1a;
+            box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.05);
+        }
+
+        .form-group input:disabled {
+            background: #f5f5f5;
+            cursor: not-allowed;
+        }
+
+        .code-input-wrapper {
+            display: flex;
+            gap: 8px;
+        }
+
+        .code-input-wrapper input {
+            flex: 1;
+        }
+
+        .get-code-btn {
+            padding: 12px 20px;
+            background: #f5f5f5;
+            border: 1px solid #d1d1d1;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+            font-family: inherit;
+        }
+
+        .get-code-btn:hover:not(:disabled) {
+            background: #ebebeb;
+        }
+
+        .get-code-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .code-sent-msg {
+            font-size: 12px;
+            color: #10a37f;
+            display: none;
+        }
+
+        .code-sent-msg.visible {
+            display: block;
+        }
+
+        .submit-btn {
+            padding: 14px;
+            background: #000000;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-top: 8px;
+            font-family: inherit;
+        }
+
+        .submit-btn:hover:not(:disabled) {
+            background: #2a2a2a;
+        }
+
+        .submit-btn:disabled {
+            background: #d1d1d1;
+            cursor: not-allowed;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 140px 48px 80px;
+        }
+
+        .hero {
+            text-align: center;
+            margin-bottom: 80px;
+        }
+
+        .hero-title {
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 24px;
+            color: #1a1a1a;
+        }
+
+        .hero-subtitle {
+            font-size: clamp(1rem, 2vw, 1.25rem);
+            color: #666;
+            font-weight: 400;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 32px;
+            margin-top: 60px;
+        }
+
+        .service-card {
+            background: #ffffff;
+            width: 80%;
+            margin: 40px auto;
+            min-height: 100px;
+            display: flex;
+            flex-direction: column;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid #e5e5e5;
+            transition: all 0.3s ease;
+        }
+
+        .service-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
+        }
+
+        .video-wrapper {
+            position: relative;
+            height: 400px;
+            width: 100%;
+            overflow: hidden;
+            background: #f5f5f5;
+            cursor: pointer;
+        }
+
+        .service-video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.4s ease;
+        }
+
+        .service-card:hover .service-video {
+            transform: scale(1.05);
+        }
+
+        .play-overlay {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            opacity: 0.9;
+            transition: all 0.3s ease;
+            pointer-events: none;
+        }
+
+        .video-wrapper:hover .play-overlay {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1.1);
+        }
+
+        .video-wrapper.playing .play-overlay {
+            opacity: 0;
+        }
+
+        .service-content {
+            padding: 28px 24px;
+        }
+
+        .service-title {
+            font-size: 1.35rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: #1a1a1a;
+        }
+
+        .service-description {
+            font-size: 0.95rem;
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .cta-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 11px 20px;
+            background: #000000;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: inherit;
+        }
+
+        .cta-button:hover {
+            background: #2a2a2a;
+            transform: translateX(2px);
+        }
+
+        .button-arrow {
+            display: inline-block;
+            transition: transform 0.2s ease;
+            font-size: 1.1rem;
+        }
+
+        .cta-button:hover .button-arrow {
+            transform: translateX(3px);
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                padding: 16px 24px;
+            }
+
+            .logo {
+                font-size: 16px;
+            }
+
+            .logo svg {
+                width: 28px;
+                height: 28px;
+            }
+
+            .container {
+                padding: 100px 24px 60px;
+            }
+
+            .modal {
+                padding: 32px 24px;
+            }
+
+            .services-grid {
+                grid-template-columns: 1fr;
+                gap: 24px;
+            }
+        }
+    </style>
+
+    <script>
+        const signupBtn = document.getElementById('signupBtn');
+        const modalOverlay = document.getElementById('modalOverlay');
+        const modalClose = document.getElementById('modalClose');
+        const signupForm = document.getElementById('signupForm');
+        const getCodeBtn = document.getElementById('getCodeBtn');
+        const codeInput = document.getElementById('code');
+        const submitBtn = document.getElementById('submitBtn');
+        const codeSentMsg = document.getElementById('codeSentMsg');
+        const profileMenu = document.getElementById('profileMenu');
+        const profileName = document.getElementById('profileName');
+        const profileInitial = document.getElementById('profileInitial');
+
+        let userData = null;
+
+        signupBtn.addEventListener('click', () => {
+            modalOverlay.classList.add('active');
+        });
+
+        modalClose.addEventListener('click', () => {
+            modalOverlay.classList.remove('active');
+        });
+
+        modalOverlay.addEventListener('click', (e) => {
+            if (e.target === modalOverlay) {
+                modalOverlay.classList.remove('active');
+            }
+        });
+
+        getCodeBtn.addEventListener('click', () => {
+            const email = document.getElementById('email').value;
+            if (!email) {
+                alert('Please enter your email first');
+                return;
+            }
+            
+            getCodeBtn.disabled = true;
+            getCodeBtn.textContent = 'Sending...';
+            
+            setTimeout(() => {
+                codeInput.disabled = false;
+                codeInput.focus();
+                submitBtn.disabled = false;
+                codeSentMsg.classList.add('visible');
+                getCodeBtn.textContent = 'Code Sent';
+                
+                setTimeout(() => {
+                    getCodeBtn.disabled = false;
+                    getCodeBtn.textContent = 'Resend';
+                }, 2000);
+            }, 1500);
+        });
+
+        signupForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const code = codeInput.value;
+            
+            if (!code) {
+                alert('Please enter the verification code');
+                return;
+            }
+            
+            submitBtn.textContent = 'Creating account...';
+            submitBtn.disabled = true;
+            
+            setTimeout(() => {
+                userData = { name, email };
+                
+                signupBtn.style.display = 'none';
+                profileMenu.style.display = 'flex';
+                profileName.textContent = name;
+                profileInitial.textContent = name.charAt(0).toUpperCase();
+                
+                modalOverlay.classList.remove('active');
+                signupForm.reset();
+                codeInput.disabled = true;
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'Submit';
+                codeSentMsg.classList.remove('visible');
+                getCodeBtn.textContent = 'Get Code';
+                
+                setTimeout(() => {
+                    alert(`Welcome, ${name}! Your account has been created successfully.`);
+                }, 300);
+            }, 1500);
+        });
+
+        const videoWrappers = document.querySelectorAll('.video-wrapper');
+        
+        videoWrappers.forEach(wrapper => {
+            const video = wrapper.querySelector('.service-video');
+            
+            wrapper.addEventListener('click', function() {
+                if (video.paused) {
+                    video.play();
+                    wrapper.classList.add('playing');
+                } else {
+                    video.pause();
+                    wrapper.classList.remove('playing');
+                }
+            });
+
+            wrapper.addEventListener('mouseenter', function() {
+                if (video.paused) {
+                    video.play();
+                }
+            });
+
+            wrapper.addEventListener('mouseleave', function() {
+                video.pause();
+                video.currentTime = 0;
+                wrapper.classList.remove('playing');
+            });
+        });
+    </script>
 </body>
 </html>
