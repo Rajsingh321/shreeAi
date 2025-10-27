@@ -1,305 +1,674 @@
-// ==========================
-// VARIABLES
-// ==========================
-let userData = null;
+// ============================================================
+// SHREEAI - FRONTEND JAVASCRIPT
+// Calls Node.js backend for email sending
+// ============================================================
 
-// 👇 Meeting Scheduler Variables
-const tryServiceBtns = document.querySelectorAll('.tryServiceBtn');
-const scheduleOverlay = document.getElementById('bookingModalOverlay');
-const scheduleClose = document.getElementById('bookingModalClose');
-const meetingDate = document.getElementById('meetingDate');
-const meetingTime = document.getElementById('meetingTime');
-const scheduleForm = document.getElementById('bookingForm');
-const successOverlay = document.getElementById('successOverlay');
-const successClose = document.getElementById('successBtn');
-const fullNameInput = document.getElementById('bookingName');
+'use strict';
 
-// Modal Elements
-const modalOverlay = document.getElementById('modalOverlay');
-const closeModal = document.getElementById('modalClose');
-const signupForm = document.getElementById('signupForm');
-
-// ==========================
-// SMOOTH SCROLL
-// ==========================
-document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-  anchor.addEventListener('click', function (e) {
-    e.preventDefault();
-    const target = document.querySelector(this.getAttribute('href'));
-    if (target) {
-      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-  });
-});
-
-// ==========================
-// SIGNUP MODAL LOGIC
-// ==========================
-closeModal.addEventListener('click', () => {
-  modalOverlay.classList.remove('active');
-});
-
-modalOverlay.addEventListener('click', (e) => {
-  if (e.target === modalOverlay) {
-    modalOverlay.classList.remove('active');
-  }
-});
-
-signupForm.addEventListener('submit', (e) => {
-  e.preventDefault();
-  
-  const name = document.getElementById('name').value;
-  const email = document.getElementById('email').value;
-
-  userData = { name, email };
-
-  console.log('User Data:', userData);
-  
-  modalOverlay.classList.remove('active');
-  signupForm.reset();
-  
-  alert(`✅ Welcome, ${name}! You're all signed up.`);
-});
-
-// ==========================
-// MEETING SCHEDULER LOGIC (NEW)
-// ==========================
-
-// Utility: Check if date is weekend
-function isWeekend(date) {
-  const day = date.getDay();
-  return day === 0 || day === 6; // 0 = Sunday, 6 = Saturday
-}
-
-// Set minimum date to today
-function setMinDate() {
-  const today = new Date();
-  const isoToday = today.toISOString().split('T')[0];
-  meetingDate.setAttribute('min', isoToday);
-}
-setMinDate();
-
-// Date validation - block weekends
-meetingDate.addEventListener('change', () => {
-  const selected = new Date(meetingDate.value);
-  if (isWeekend(selected)) {
-    alert('Please select Saturday or Sunday only.');
-    meetingDate.value = '';
-  }
-});
-
-// Open meeting popup when "Try This Service" clicked
-tryServiceBtns.forEach(btn => {
-  btn.addEventListener('click', () => {
-    if (!userData) {
-      // User not signed up - show signup modal
-      modalOverlay.classList.add('active');
-      return;
-    }
-    
-    // User signed up - show meeting scheduler
-    if (userData.name) {
-      fullNameInput.value = userData.name;
-    }
-    scheduleOverlay.classList.add('active');
-    scheduleOverlay.setAttribute('aria-hidden', 'false');
-  });
-});
-
-// Close meeting popup
-scheduleClose.addEventListener('click', () => {
-  scheduleOverlay.classList.remove('active');
-  scheduleOverlay.setAttribute('aria-hidden', 'true');
-});
-
-// Close on outside click
-scheduleOverlay.addEventListener('click', e => {
-  if (e.target === scheduleOverlay) {
-    scheduleOverlay.classList.remove('active');
-    scheduleOverlay.setAttribute('aria-hidden', 'true');
-  }
-});
-
-// Form submission
-scheduleForm.addEventListener('submit', e => {
-  e.preventDefault();
-  
-  const dateVal = meetingDate.value;
-  const timeVal = meetingTime.value;
-  const nameVal = fullNameInput.value;
-  const countryVal = document.getElementById('bookingCountry').value;
-  
-  // Get selected services
-  const selectedServices = [];
-  document.querySelectorAll('input[name="services"]:checked').forEach(checkbox => {
-    selectedServices.push(checkbox.value);
-  });
-  
-  if (!dateVal || !timeVal) {
-    alert('Please select both date and time.');
-    return;
-  }
-  
-  if (selectedServices.length === 0) {
-    alert('Please select at least one service.');
-    return;
-  }
-  
-  // Log meeting data
-  const meetingData = {
-    name: nameVal,
-    date: dateVal,
-    time: timeVal,
-    country: countryVal,
-    services: selectedServices,
-    userEmail: userData ? userData.email : ''
-  };
-  
-  console.log('Meeting Scheduled:', meetingData);
-  
-  // Close meeting popup and show success
-  scheduleOverlay.classList.remove('active');
-  scheduleOverlay.setAttribute('aria-hidden', 'true');
-  successOverlay.classList.add('active');
-  successOverlay.setAttribute('aria-hidden', 'false');
-  
-  scheduleForm.reset();
-});
-
-// Close success popup
-successClose.addEventListener('click', () => {
-  successOverlay.classList.remove('active');
-  successOverlay.setAttribute('aria-hidden', 'true');
-});
-
-successOverlay.addEventListener('click', e => {
-  if (e.target === successOverlay) {
-    successOverlay.classList.remove('active');
-    successOverlay.setAttribute('aria-hidden', 'true');
-  }
-});
-
-// ==========================
-// VIDEO MUTE/UNMUTE + AUTO PLAY (UPDATED)
-// ==========================
-const videoWrappers = document.querySelectorAll('.video-wrapper');
-
-videoWrappers.forEach(wrapper => {
-  const video = wrapper.querySelector('.service-video');
-  const soundIndicator = wrapper.querySelector('.sound-indicator');
-  const mutedIcon = wrapper.querySelector('.muted-icon');
-  const unmutedIcon = wrapper.querySelector('.unmuted-icon');
-  const playOverlay = wrapper.querySelector('.play-overlay');
-  
-  // Mute/Unmute toggle on sound indicator click
-  if (soundIndicator) {
-    soundIndicator.addEventListener('click', function(e) {
-      e.stopPropagation();
-      
-      if (video.muted) {
-        video.muted = false;
-        mutedIcon.style.display = 'none';
-        unmutedIcon.style.display = 'block';
-        soundIndicator.classList.remove('muted');
-      } else {
-        video.muted = true;
-        mutedIcon.style.display = 'block';
-        unmutedIcon.style.display = 'none';
-        soundIndicator.classList.add('muted');
-      }
-    });
-  }
-  
-  // Auto-play when video comes into view (Intersection Observer)
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        video.play();
-        if (playOverlay) playOverlay.style.opacity = '0';
-      } else {
-        video.pause();
-        if (playOverlay) playOverlay.style.opacity = '1';
-      }
-    });
-  }, { threshold: 0.5 });
-  
-  observer.observe(wrapper);
-  
-  // Click on video to play/pause
-  wrapper.addEventListener('click', function(e) {
-    // Ignore if clicked on sound indicator
-    if (soundIndicator && (e.target === soundIndicator || soundIndicator.contains(e.target))) {
-      return;
-    }
-    
-    if (video.paused) {
-      video.play();
-      wrapper.classList.add('playing');
-      if (playOverlay) playOverlay.style.opacity = '0';
-    } else {
-      video.pause();
-      wrapper.classList.remove('playing');
-      if (playOverlay) playOverlay.style.opacity = '1';
-    }
-  });
-});
-
-// ==========================
-// SCROLL ANIMATIONS
-// ==========================
-const observerOptions = {
-  threshold: 0.1,
-  rootMargin: '0px 0px -50px 0px'
+// ============================================================
+// CONFIGURATION
+// ============================================================
+const CONFIG = {
+    // Change this to your backend URL
+    API_BASE_URL: 'http://localhost:3000', // Local development
+    // API_BASE_URL: 'https://your-backend.com', // Production
 };
 
-const observer = new IntersectionObserver((entries) => {
-  entries.forEach(entry => {
-    if (entry.isIntersecting) {
-      entry.target.classList.add('visible');
-    }
-  });
-}, observerOptions);
+// ============================================================
+// GLOBAL STATE
+// ============================================================
+const AppState = {
+    userData: null,
+    isSignedUp: false,
+    verificationCode: null,
+    codeExpiry: null
+};
 
-document.querySelectorAll('.service-card, .about-content, .contact-form').forEach(el => {
-  observer.observe(el);
+// ============================================================
+// DOM ELEMENTS
+// ============================================================
+const DOM = {
+    // Header
+    header: document.getElementById('header'),
+    logoBtn: document.getElementById('logoBtn'),
+    signupBtn: document.getElementById('signupBtn'),
+    profileMenu: document.getElementById('profileMenu'),
+    profileName: document.getElementById('profileName'),
+    profileInitial: document.getElementById('profileInitial'),
+    
+    // Signup Modal
+    signupModal: document.getElementById('signupModal'),
+    signupModalClose: document.getElementById('signupModalClose'),
+    signupForm: document.getElementById('signupForm'),
+    signupName: document.getElementById('signupName'),
+    signupEmail: document.getElementById('signupEmail'),
+    signupPassword: document.getElementById('signupPassword'),
+    verificationCode: document.getElementById('verificationCode'),
+    getCodeBtn: document.getElementById('getCodeBtn'),
+    signupSubmitBtn: document.getElementById('signupSubmitBtn'),
+    codeSentMsg: document.getElementById('codeSentMsg'),
+    
+    // Booking Modal
+    bookingModal: document.getElementById('bookingModal'),
+    bookingModalClose: document.getElementById('bookingModalClose'),
+    bookingForm: document.getElementById('bookingForm'),
+    bookingName: document.getElementById('bookingName'),
+    bookingEmail: document.getElementById('bookingEmail'),
+    bookingPhone: document.getElementById('bookingPhone'),
+    bookingGender: document.getElementById('bookingGender'),
+    bookingCountry: document.getElementById('bookingCountry'),
+    meetingDate: document.getElementById('meetingDate'),
+    meetingTime: document.getElementById('meetingTime'),
+    bookingSubmitBtn: document.getElementById('bookingSubmitBtn'),
+    
+    // Success Modal
+    successModal: document.getElementById('successModal'),
+    successBtn: document.getElementById('successBtn'),
+    
+    // Service Buttons
+    serviceButtons: document.querySelectorAll('.btn-service'),
+    
+    // Video Elements
+    videoWrappers: document.querySelectorAll('.service-video-wrapper')
+};
+
+// ============================================================
+// UTILITY FUNCTIONS
+// ============================================================
+const Utils = {
+    // Email Validation
+    isValidEmail(email) {
+        const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return re.test(email);
+    },
+    
+    // Phone Validation
+    isValidPhone(phone) {
+        const re = /^[\d\s\+\-\(\)]+$/;
+        return re.test(phone) && phone.replace(/\D/g, '').length >= 10;
+    },
+    
+    // Generate 6-digit code
+    generateCode() {
+        return Math.floor(100000 + Math.random() * 900000).toString();
+    },
+    
+    // Check if code expired
+    isCodeExpired() {
+        if (!AppState.codeExpiry) return true;
+        return Date.now() > AppState.codeExpiry;
+    },
+    
+    // Check if date is weekend
+    isWeekend(dateString) {
+        const date = new Date(dateString);
+        const day = date.getDay();
+        return day === 0 || day === 6;
+    },
+    
+    // Format date
+    formatDate(date) {
+        return date.toISOString().split('T')[0];
+    },
+    
+    // Show notification
+    notify(message, type = 'info') {
+        alert(message);
+    },
+    
+    // Generate booking ID
+    generateBookingId() {
+        return 'SHREEAI-' + Date.now() + '-' + Math.random().toString(36).substr(2, 5).toUpperCase();
+    }
+};
+
+// ============================================================
+// BACKEND API
+// ============================================================
+const API = {
+    // Send verification code
+    async sendVerificationCode(email, code) {
+        try {
+            console.log('📧 Sending verification email to:', email);
+            console.log('🔢 Code:', code);
+            console.log('🌐 Backend URL:', `${CONFIG.API_BASE_URL}/api/send-verification`);
+            
+            const response = await fetch(`${CONFIG.API_BASE_URL}/api/send-verification`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    email: email,
+                    code: code
+                })
+            });
+            
+            console.log('📊 Response Status:', response.status);
+            
+            if (!response.ok) {
+                const errorData = await response.json();
+                console.error('❌ API Error:', errorData);
+                return false;
+            }
+            
+            const result = await response.json();
+            console.log('✅ API Response:', result);
+            
+            return result.success === true;
+            
+        } catch (error) {
+            console.error('❌ Network Error:', error.message);
+            
+            // Check if backend is running
+            if (error.message.includes('Failed to fetch')) {
+                Utils.notify('❌ Cannot connect to backend server. Make sure backend is running on ' + CONFIG.API_BASE_URL);
+            }
+            
+            return false;
+        }
+    },
+    
+    // Send booking email
+    async sendBookingEmail(bookingData) {
+        try {
+            console.log('📧 Sending booking email:', bookingData);
+            
+            const response = await fetch(`${CONFIG.API_BASE_URL}/api/send-booking`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(bookingData)
+            });
+            
+            console.log('📊 Booking Response Status:', response.status);
+            
+            if (!response.ok) {
+                const errorData = await response.json();
+                console.error('❌ Booking API Error:', errorData);
+                return false;
+            }
+            
+            const result = await response.json();
+            console.log('✅ Booking API Response:', result);
+            
+            return result.success === true;
+            
+        } catch (error) {
+            console.error('❌ Booking Network Error:', error.message);
+            
+            if (error.message.includes('Failed to fetch')) {
+                Utils.notify('❌ Cannot connect to backend server. Make sure backend is running on ' + CONFIG.API_BASE_URL);
+            }
+            
+            return false;
+        }
+    },
+    
+    // Test backend connection
+    async testConnection() {
+        try {
+            const response = await fetch(`${CONFIG.API_BASE_URL}/health`);
+            const result = await response.json();
+            console.log('✅ Backend connection successful:', result);
+            return true;
+        } catch (error) {
+            console.error('❌ Backend connection failed:', error.message);
+            return false;
+        }
+    }
+};
+
+// ============================================================
+// MODAL MANAGER
+// ============================================================
+const ModalManager = {
+    open(modal) {
+        if (!modal) return;
+        modal.classList.add('active');
+        modal.setAttribute('aria-hidden', 'false');
+        document.body.style.overflow = 'hidden';
+    },
+    
+    close(modal) {
+        if (!modal) return;
+        modal.classList.remove('active');
+        modal.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = '';
+    },
+    
+    init() {
+        // Signup Modal
+        DOM.signupModalClose?.addEventListener('click', () => {
+            this.close(DOM.signupModal);
+        });
+        
+        DOM.signupModal?.addEventListener('click', (e) => {
+            if (e.target === DOM.signupModal) {
+                this.close(DOM.signupModal);
+            }
+        });
+        
+        // Booking Modal
+        DOM.bookingModalClose?.addEventListener('click', () => {
+            this.close(DOM.bookingModal);
+        });
+        
+        DOM.bookingModal?.addEventListener('click', (e) => {
+            if (e.target === DOM.bookingModal) {
+                this.close(DOM.bookingModal);
+            }
+        });
+        
+        // Success Modal
+        DOM.successBtn?.addEventListener('click', () => {
+            this.close(DOM.successModal);
+        });
+        
+        DOM.successModal?.addEventListener('click', (e) => {
+            if (e.target === DOM.successModal) {
+                this.close(DOM.successModal);
+            }
+        });
+        
+        // ESC key to close
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                this.close(DOM.signupModal);
+                this.close(DOM.bookingModal);
+                this.close(DOM.successModal);
+            }
+        });
+    }
+};
+
+// ============================================================
+// SIGNUP MODULE
+// ============================================================
+const SignupModule = {
+    init() {
+        DOM.signupBtn?.addEventListener('click', () => {
+            ModalManager.open(DOM.signupModal);
+        });
+        
+        DOM.getCodeBtn?.addEventListener('click', () => {
+            this.sendVerificationCode();
+        });
+        
+        DOM.signupForm?.addEventListener('submit', (e) => {
+            e.preventDefault();
+            this.handleSignup();
+        });
+    },
+    
+    async sendVerificationCode() {
+        const email = DOM.signupEmail?.value.trim();
+        
+        if (!email) {
+            Utils.notify('Please enter your email address');
+            return;
+        }
+        
+        if (!Utils.isValidEmail(email)) {
+            Utils.notify('Please enter a valid email address');
+            return;
+        }
+        
+        DOM.getCodeBtn.disabled = true;
+        DOM.getCodeBtn.textContent = 'Sending...';
+        
+        const code = Utils.generateCode();
+        AppState.verificationCode = code;
+        AppState.codeExpiry = Date.now() + (10 * 60 * 1000);
+        
+        console.log('🔐 Generated Code:', code);
+        console.log('⏰ Code Expiry:', new Date(AppState.codeExpiry));
+        
+        const success = await API.sendVerificationCode(email, code);
+        
+        if (success) {
+            DOM.verificationCode.disabled = false;
+            DOM.verificationCode.focus();
+            DOM.signupSubmitBtn.disabled = false;
+            DOM.codeSentMsg.style.display = 'block';
+            DOM.getCodeBtn.textContent = 'Code Sent ✓';
+            
+            Utils.notify('✅ Verification code sent! Check your email.');
+            
+            setTimeout(() => {
+                DOM.getCodeBtn.disabled = false;
+                DOM.getCodeBtn.textContent = 'Resend Code';
+            }, 30000);
+        } else {
+            console.error('❌ Failed to send verification email');
+            Utils.notify('❌ Failed to send code. Check console for details.');
+            DOM.getCodeBtn.disabled = false;
+            DOM.getCodeBtn.textContent = 'Get Code';
+        }
+    },
+    
+    handleSignup() {
+        const name = DOM.signupName?.value.trim();
+        const email = DOM.signupEmail?.value.trim();
+        const password = DOM.signupPassword?.value;
+        const code = DOM.verificationCode?.value.trim();
+        
+        if (!name || !email || !password || !code) {
+            Utils.notify('Please fill all fields');
+            return;
+        }
+        
+        if (!Utils.isValidEmail(email)) {
+            Utils.notify('Please enter a valid email');
+            return;
+        }
+        
+        if (password.length < 6) {
+            Utils.notify('Password must be at least 6 characters');
+            return;
+        }
+        
+        if (code.length !== 6) {
+            Utils.notify('Verification code must be 6 digits');
+            return;
+        }
+        
+        if (Utils.isCodeExpired()) {
+            Utils.notify('Verification code expired. Please request a new one.');
+            return;
+        }
+        
+        if (code !== AppState.verificationCode) {
+            Utils.notify('Invalid verification code. Please try again.');
+            return;
+        }
+        
+        DOM.signupSubmitBtn.disabled = true;
+        DOM.signupSubmitBtn.textContent = 'Creating Account...';
+        
+        setTimeout(() => {
+            AppState.userData = { name, email };
+            AppState.isSignedUp = true;
+            
+            DOM.signupBtn.style.display = 'none';
+            DOM.profileMenu.style.display = 'flex';
+            DOM.profileMenu.classList.add('active');
+            DOM.profileName.textContent = name;
+            DOM.profileInitial.textContent = name.charAt(0).toUpperCase();
+            
+            DOM.signupForm.reset();
+            DOM.verificationCode.disabled = true;
+            DOM.signupSubmitBtn.disabled = true;
+            DOM.signupSubmitBtn.textContent = 'Create Account';
+            DOM.codeSentMsg.style.display = 'none';
+            DOM.getCodeBtn.textContent = 'Get Code';
+            DOM.getCodeBtn.disabled = false;
+            
+            ModalManager.close(DOM.signupModal);
+            
+            Utils.notify(`Welcome, ${name}! You're all set.`);
+        }, 1000);
+    }
+};
+
+// ============================================================
+// BOOKING MODULE
+// ============================================================
+const BookingModule = {
+    init() {
+        this.setMinDate();
+        
+        DOM.meetingDate?.addEventListener('change', (e) => {
+            this.validateDate(e.target.value);
+        });
+        
+        DOM.serviceButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                this.handleServiceClick();
+            });
+        });
+        
+        DOM.bookingForm?.addEventListener('submit', (e) => {
+            e.preventDefault();
+            this.handleBooking();
+        });
+    },
+    
+    setMinDate() {
+        if (DOM.meetingDate) {
+            const today = Utils.formatDate(new Date());
+            DOM.meetingDate.min = today;
+        }
+    },
+    
+    validateDate(dateString) {
+        if (!dateString) return;
+        
+        if (!Utils.isWeekend(dateString)) {
+            Utils.notify('⚠️ Please select Saturday or Sunday only');
+            DOM.meetingDate.value = '';
+        }
+    },
+    
+    handleServiceClick() {
+        if (!AppState.isSignedUp) {
+            Utils.notify('Please sign up first to book a consultation');
+            ModalManager.open(DOM.signupModal);
+            
+            const checkSignup = setInterval(() => {
+                if (AppState.isSignedUp) {
+                    clearInterval(checkSignup);
+                    setTimeout(() => {
+                        this.openBookingModal();
+                    }, 500);
+                }
+            }, 100);
+            
+            setTimeout(() => clearInterval(checkSignup), 30000);
+        } else {
+            this.openBookingModal();
+        }
+    },
+    
+    openBookingModal() {
+        if (AppState.userData) {
+            DOM.bookingName.value = AppState.userData.name;
+            DOM.bookingEmail.value = AppState.userData.email;
+        }
+        
+        ModalManager.open(DOM.bookingModal);
+    },
+    
+    async handleBooking() {
+        const name = DOM.bookingName?.value.trim();
+        const email = DOM.bookingEmail?.value.trim();
+        const phone = DOM.bookingPhone?.value.trim();
+        const gender = DOM.bookingGender?.value;
+        const country = DOM.bookingCountry?.value.trim();
+        const date = DOM.meetingDate?.value;
+        const time = DOM.meetingTime?.value;
+        
+        const services = [];
+        document.querySelectorAll('input[name="services"]:checked').forEach(cb => {
+            services.push(cb.value);
+        });
+        
+        if (!name || !email || !phone || !gender || !country || !date || !time) {
+            Utils.notify('Please fill all required fields');
+            return;
+        }
+        
+        if (!Utils.isValidEmail(email)) {
+            Utils.notify('Please enter a valid email address');
+            return;
+        }
+        
+        if (!Utils.isValidPhone(phone)) {
+            Utils.notify('Please enter a valid phone number');
+            return;
+        }
+        
+        if (!Utils.isWeekend(date)) {
+            Utils.notify('Please select a weekend date (Saturday or Sunday)');
+            return;
+        }
+        
+        if (services.length === 0) {
+            Utils.notify('Please select at least one service');
+            return;
+        }
+        
+        DOM.bookingSubmitBtn.disabled = true;
+        DOM.bookingSubmitBtn.textContent = 'Booking...';
+        DOM.bookingSubmitBtn.classList.add('loading');
+        
+        const bookingData = {
+            bookingId: Utils.generateBookingId(),
+            name,
+            email,
+            phone,
+            gender,
+            country,
+            date,
+            time,
+            services,
+            createdAt: new Date().toISOString()
+        };
+        
+        const emailSent = await API.sendBookingEmail(bookingData);
+        
+        if (emailSent) {
+            ModalManager.close(DOM.bookingModal);
+            ModalManager.open(DOM.successModal);
+            DOM.bookingForm.reset();
+            
+            console.log('✅ Booking successful:', bookingData);
+        } else {
+            Utils.notify('❌ Booking failed. Check console and try again.');
+        }
+        
+        DOM.bookingSubmitBtn.disabled = false;
+        DOM.bookingSubmitBtn.textContent = 'Book Consultation';
+        DOM.bookingSubmitBtn.classList.remove('loading');
+    }
+};
+
+// ============================================================
+// VIDEO MODULE
+// ============================================================
+const VideoModule = {
+    init() {
+        DOM.videoWrappers.forEach(wrapper => {
+            this.setupVideo(wrapper);
+        });
+    },
+    
+    setupVideo(wrapper) {
+        const video = wrapper.querySelector('.service-video');
+        const playBtn = wrapper.querySelector('.video-play-btn');
+        const soundBtn = wrapper.querySelector('.video-sound-btn');
+        
+        if (!video) return;
+        
+        const togglePlay = () => {
+            if (video.paused) {
+                video.play();
+                wrapper.classList.add('playing');
+            } else {
+                video.pause();
+                wrapper.classList.remove('playing');
+            }
+        };
+        
+        wrapper.addEventListener('click', (e) => {
+            if (e.target === soundBtn || soundBtn.contains(e.target)) {
+                return;
+            }
+            togglePlay();
+        });
+        
+        playBtn?.addEventListener('click', (e) => {
+            e.stopPropagation();
+            togglePlay();
+        });
+        
+        soundBtn?.addEventListener('click', (e) => {
+            e.stopPropagation();
+            video.muted = !video.muted;
+            soundBtn.classList.toggle('muted');
+        });
+        
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    video.play().catch(() => {});
+                    wrapper.classList.add('playing');
+                } else {
+                    video.pause();
+                    wrapper.classList.remove('playing');
+                }
+            });
+        }, { threshold: 0.5 });
+        
+        observer.observe(wrapper);
+    }
+};
+
+// ============================================================
+// HEADER SCROLL EFFECT
+// ============================================================
+const HeaderScroll = {
+    init() {
+        let lastScroll = 0;
+        
+        window.addEventListener('scroll', () => {
+            const currentScroll = window.pageYOffset;
+            
+            if (currentScroll > 50) {
+                DOM.header?.classList.add('scrolled');
+            } else {
+                DOM.header?.classList.remove('scrolled');
+            }
+            
+            lastScroll = currentScroll;
+        });
+    }
+};
+
+// ============================================================
+// INITIALIZE APP
+// ============================================================
+document.addEventListener('DOMContentLoaded', async () => {
+    console.log('🚀 ShreeAI Website Initialized');
+    console.log('🌐 Backend URL:', CONFIG.API_BASE_URL);
+    
+    // Test backend connection
+    const backendConnected = await API.testConnection();
+    if (backendConnected) {
+        console.log('✅ Backend server is running!');
+    } else {
+        console.warn('⚠️ Backend server not reachable. Please start the backend server.');
+        console.warn('⚠️ Run: npm start (in backend folder)');
+    }
+    
+    ModalManager.init();
+    SignupModule.init();
+    BookingModule.init();
+    VideoModule.init();
+    HeaderScroll.init();
+    
+    console.log('✅ All modules loaded successfully');
+    console.log('💡 Website is 100% ready!');
 });
 
-// ==========================
-// MOBILE MENU TOGGLE
-// ==========================
-const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
-const navLinks = document.querySelector('.nav-links');
+// ============================================================
+// ERROR HANDLING
+// ============================================================
+window.addEventListener('error', (e) => {
+    console.error('❌ Global error:', e.error);
+});
 
-if (mobileMenuBtn) {
-  mobileMenuBtn.addEventListener('click', () => {
-    navLinks.classList.toggle('active');
-    mobileMenuBtn.classList.toggle('active');
-  });
-  
-  // Close menu when clicking on a link
-  document.querySelectorAll('.nav-links a').forEach(link => {
-    link.addEventListener('click', () => {
-      navLinks.classList.remove('active');
-      mobileMenuBtn.classList.remove('active');
-    });
-  });
-}
-
-// ==========================
-// FORM VALIDATION
-// ==========================
-const contactForm = document.getElementById('contactForm');
-
-if (contactForm) {
-  contactForm.addEventListener('submit', (e) => {
-    e.preventDefault();
-    
-    const formData = new FormData(contactForm);
-    const data = Object.fromEntries(formData);
-    
-    console.log('Contact Form Data:', data);
-    
-    alert('✅ Thank you for your message! We will get back to you soon.');
-    contactForm.reset();
-  });
-}
+window.addEventListener('unhandledrejection', (e) => {
+    console.error('❌ Unhandled promise rejection:', e.reason);
+});
