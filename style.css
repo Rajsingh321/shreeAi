@@ -129,7 +129,7 @@ body {
 }
 
 .logo img {
-    width: 40px;
+    width: 60px;
     height: 40px;
     object-fit: contain;
 }
@@ -905,3 +905,4 @@ select:focus-visible {
 .visible {
     display: block !important;
 }
+
