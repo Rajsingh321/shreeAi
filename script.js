@@ -595,7 +595,7 @@ const VideoModule = {
         
         soundBtn?.addEventListener('click', (e) => {
             e.stopPropagation();
-            video.muted = !video.muted;
+            video.muted = false;
             soundBtn.classList.toggle('muted');
         });
         
@@ -672,3 +672,4 @@ window.addEventListener('error', (e) => {
 window.addEventListener('unhandledrejection', (e) => {
     console.error('❌ Unhandled promise rejection:', e.reason);
 });
+
