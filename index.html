@@ -1,499 +1,271 @@
-<!DOCTYPE html>
-<html lang="en">
+// ============================================================
+// VIDEO FUNCTIONALITY - Click to Play/Pause
+// ============================================================
 
-<head>
-    <meta name="description" content="ShreeAI - AI Consultation Services">
-    <meta name="keywords" content="AI, consultation, shreeai">
-    <meta name="author" content="ShreeAI">
+document.addEventListener('DOMContentLoaded', function () {
+    const serviceCards = document.querySelectorAll('.service-card');
 
-    <!-- Open Graph -->
-    <meta property="og:title" content="ShreeAI">
-    <meta property="og:description" content="Professional AI Consultation">
-    <meta property="og:image" content="/logo.png">
+    serviceCards.forEach(card => {
+        const video = card.querySelector('.service-video');
+        const videoWrapper = card.querySelector('.service-video-wrapper');
+        const playBtn = card.querySelector('.video-play-btn');
+        const overlay = card.querySelector('.video-overlay');
+        
+        // Remove sound button completely
+        const soundBtn = card.querySelector('.video-sound-btn');
+        if (soundBtn) {
+            soundBtn.remove();
+        }
 
-    <!-- Google verification -->
-    <meta name="google-site-verification" content="your-code">
-</head>
+        // Auto-play videos on load (muted for autoplay policy)
+        const playPromise = video.play();
+        if (playPromise !== undefined) {
+            playPromise.catch(error => {
+                console.log('Autoplay prevented:', error);
+                overlay.classList.add('visible');
+            });
+        }
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="ShreeAI - Transform your business with cutting-edge AI solutions">
-    <meta name="keywords" content="AI, Artificial Intelligence, Machine Learning, Business Solutions">
-    <meta name="author" content="ShreeAI">
-    <title>ShreeAI - AI Solutions for Your Business</title>
+        // Update play button icon based on video state
+        function updatePlayButton() {
+            if (video.paused) {
+                overlay.classList.add('visible');
+                playBtn.innerHTML = `
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M8 5v14l11-7z" />
+                    </svg>
+                `;
+            } else {
+                overlay.classList.remove('visible');
+                playBtn.innerHTML = `
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z" />
+                    </svg>
+                `;
+            }
+        }
 
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
-        rel="stylesheet">
+        // Click on video wrapper to toggle play/pause
+        videoWrapper.addEventListener('click', function(e) {
+            // Don't trigger if clicking on service button
+            if (e.target.closest('.btn-service')) return;
+            
+            if (video.paused) {
+                video.play();
+            } else {
+                video.pause();
+            }
+            updatePlayButton();
+        });
 
-    <!-- Stylesheet -->
-    <link rel="stylesheet" href="style.css">
-</head>
+        // Show overlay on hover when video is playing
+        videoWrapper.addEventListener('mouseenter', function() {
+            if (!video.paused) {
+                overlay.classList.add('visible');
+            }
+        });
 
-<body>
+        videoWrapper.addEventListener('mouseleave', function() {
+            if (!video.paused) {
+                overlay.classList.remove('visible');
+            }
+        });
 
-    <!-- ============================================================
-         HEADER - Fixed Navigation
-         ============================================================ -->
-    <header class="header" id="header">
-        <div class="header-container">
-            <div class="logo" id="logoBtn">
-                <img src="logo2.png" alt="ShreeAI Logo" width="40" height="40" onerror="this.style.display='none'">
-                <span class="logo-text">ShreeAI</span>
-            </div>
+        // Update button when video ends (for non-looping videos)
+        video.addEventListener('ended', updatePlayButton);
+        
+        // Initialize button state
+        updatePlayButton();
+    });
+});
 
-            <!-- Sign Up Button (Hidden after signup) -->
-            <button class="btn-signup" id="signupBtn">Sign up</button>
+// ============================================================
+// MODAL FUNCTIONALITY
+// ============================================================
 
-            <!-- Profile Menu (Hidden initially) -->
-            <div class="profile-menu" id="profileMenu" style="display: none;">
-                <div class="profile-btn" id="profileBtn">
-                    <div class="profile-avatar" id="profileAvatar">
-                        <span id="profileInitial">U</span>
-                    </div>
-                    <span class="profile-name" id="profileName">User</span>
-                </div>
-            </div>
-        </div>
-    </header>
+// Sign Up Modal
+const signupBtn = document.getElementById('signupBtn');
+const signupModal = document.getElementById('signupModal');
+const signupModalClose = document.getElementById('signupModalClose');
+const signupForm = document.getElementById('signupForm');
+const getCodeBtn = document.getElementById('getCodeBtn');
+const verificationCode = document.getElementById('verificationCode');
+const codeSentMsg = document.getElementById('codeSentMsg');
+const signupSubmitBtn = document.getElementById('signupSubmitBtn');
 
-    <!-- ============================================================
-         SIGNUP MODAL
-         ============================================================ -->
-    <div class="modal-overlay" id="signupModal" role="dialog" aria-modal="true" aria-labelledby="signupTitle">
-        <div class="modal">
-            <button class="modal-close" id="signupModalClose" aria-label="Close">&times;</button>
+// Booking Modal
+const bookingModal = document.getElementById('bookingModal');
+const bookingModalClose = document.getElementById('bookingModalClose');
+const bookingForm = document.getElementById('bookingForm');
+const serviceButtons = document.querySelectorAll('.btn-service');
 
-            <div class="modal-header">
-                <h2 class="modal-title" id="signupTitle">Create your account</h2>
-                <p class="modal-subtitle">Join ShreeAI to access cutting-edge AI solutions</p>
-            </div>
+// Success Modal
+const successModal = document.getElementById('successModal');
+const successBtn = document.getElementById('successBtn');
 
-            <form class="form" id="signupForm" novalidate>
-                <div class="form-group">
-                    <label for="signupName" class="form-label">Full Name</label>
-                    <input type="text" id="signupName" name="name" class="form-input" placeholder="Enter your full name"
-                        required autocomplete="name">
-                </div>
+// Profile Menu
+const profileMenu = document.getElementById('profileMenu');
+const logoBtn = document.getElementById('logoBtn');
 
-                <div class="form-group">
-                    <label for="signupEmail" class="form-label">Email Address</label>
-                    <input type="email" id="signupEmail" name="email" class="form-input" placeholder="you@example.com"
-                        required autocomplete="email">
-                </div>
+// Open Sign Up Modal
+signupBtn?.addEventListener('click', () => {
+    signupModal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+});
 
-                <div class="form-group">
-                    <label for="signupPassword" class="form-label">Password</label>
-                    <input type="password" id="signupPassword" name="password" class="form-input"
-                        placeholder="Create a strong password" required minlength="6" autocomplete="new-password">
-                </div>
+// Close Sign Up Modal
+signupModalClose?.addEventListener('click', () => {
+    signupModal.style.display = 'none';
+    document.body.style.overflow = 'auto';
+});
 
-                <div class="form-group">
-                    <label for="verificationCode" class="form-label">Verification Code</label>
-                    <div class="input-group">
-                        <input type="text" id="verificationCode" name="code" class="form-input"
-                            placeholder="Enter 6-digit code" maxlength="6" pattern="[0-9]{6}" disabled required>
-                        <button type="button" class="btn-code" id="getCodeBtn">
-                            Get Code
-                        </button>
-                    </div>
-                    <p class="form-hint success" id="codeSentMsg" style="display: none;">
-                        ✓ Code sent! Check your email
-                    </p>
-                </div>
+// Get Verification Code
+getCodeBtn?.addEventListener('click', () => {
+    const email = document.getElementById('signupEmail').value;
+    if (!email || !email.includes('@')) {
+        alert('Please enter a valid email address first');
+        return;
+    }
 
-                <button type="submit" class="btn-primary" id="signupSubmitBtn" disabled>
-                    Create Account
-                </button>
-            </form>
-        </div>
-    </div>
+    // Simulate sending code
+    getCodeBtn.disabled = true;
+    getCodeBtn.textContent = 'Sending...';
 
-    <!-- ============================================================
-         BOOKING MODAL
-         ============================================================ -->
-    <div class="modal-overlay" id="bookingModal" role="dialog" aria-modal="true" aria-labelledby="bookingTitle">
-        <div class="modal modal-large">
-            <button class="modal-close" id="bookingModalClose" aria-label="Close">&times;</button>
+    setTimeout(() => {
+        verificationCode.disabled = false;
+        signupSubmitBtn.disabled = false;
+        codeSentMsg.style.display = 'block';
+        getCodeBtn.textContent = 'Code Sent ✓';
+        getCodeBtn.style.backgroundColor = '#10B981';
+    }, 1500);
+});
 
-            <div class="modal-header">
-                <h2 class="modal-title" id="bookingTitle">Book Your Consultation</h2>
-                <p class="modal-subtitle">Schedule a meeting with our AI experts</p>
-            </div>
+// Handle Sign Up Form Submission
+signupForm?.addEventListener('submit', (e) => {
+    e.preventDefault();
 
-            <form class="form" id="bookingForm" novalidate>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="bookingName" class="form-label">Full Name</label>
-                        <input type="text" id="bookingName" name="name" class="form-input" placeholder="Your full name"
-                            required autocomplete="name">
-                    </div>
+    const name = document.getElementById('signupName').value;
+    const email = document.getElementById('signupEmail').value;
+    const code = document.getElementById('verificationCode').value;
 
-                    <div class="form-group">
-                        <label for="bookingEmail" class="form-label">Email Address</label>
-                        <input type="email" id="bookingEmail" name="email" class="form-input"
-                            placeholder="your@email.com" required autocomplete="email">
-                    </div>
-                </div>
+    if (code.length !== 6) {
+        alert('Please enter a valid 6-digit verification code');
+        return;
+    }
 
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="bookingPhone" class="form-label">Phone Number</label>
-                        <input type="tel" id="bookingPhone" name="phone" class="form-input"
-                            placeholder="+91 98765 43210" required autocomplete="tel">
-                    </div>
+    // Store user data (in real app, this would be server-side)
+    localStorage.setItem('userName', name);
+    localStorage.setItem('userEmail', email);
 
-                    <div class="form-group">
-                        <label for="bookingGender" class="form-label">Gender</label>
-                        <select id="bookingGender" name="gender" class="form-input" required>
-                            <option value="">Select Gender</option>
-                            <option value="Male">Male</option>
-                            <option value="Female">Female</option>
-                            <option value="Other">Other</option>
-                            <option value="Prefer not to say">Prefer not to say</option>
-                        </select>
-                    </div>
-                </div>
+    // Update UI
+    signupBtn.style.display = 'none';
+    profileMenu.style.display = 'block';
+    document.getElementById('profileName').textContent = name.split(' ')[0];
+    document.getElementById('profileInitial').textContent = name.charAt(0).toUpperCase();
 
-                <div class="form-group">
-                    <label for="bookingCountry" class="form-label">Country</label>
-                    <input type="text" id="bookingCountry" name="country" class="form-input" placeholder="Your country"
-                        required autocomplete="country-name">
-                </div>
+    // Close modal
+    signupModal.style.display = 'none';
+    document.body.style.overflow = 'auto';
 
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="meetingDate" class="form-label">Preferred Date (Weekends only)</label>
-                        <input type="date" id="meetingDate" name="date" class="form-input" required>
-                    </div>
+    // Reset form
+    signupForm.reset();
+    verificationCode.disabled = true;
+    signupSubmitBtn.disabled = true;
+    getCodeBtn.disabled = false;
+    getCodeBtn.textContent = 'Get Code';
+    getCodeBtn.style.backgroundColor = '';
+    codeSentMsg.style.display = 'none';
+});
 
-                    <div class="form-group">
-                        <label for="meetingTime" class="form-label">Preferred Time</label>
-                        <select id="meetingTime" name="time" class="form-input" required>
-                            <option value="">Select Time</option>
-                            <option value="09:00 AM">09:00 AM</option>
-                            <option value="10:00 AM">10:00 AM</option>
-                            <option value="11:00 AM">11:00 AM</option>
-                            <option value="12:00 PM">12:00 PM</option>
-                            <option value="01:00 PM">01:00 PM</option>
-                            <option value="02:00 PM">02:00 PM</option>
-                            <option value="03:00 PM">03:00 PM</option>
-                            <option value="04:00 PM">04:00 PM</option>
-                            <option value="05:00 PM">05:00 PM</option>
-                            <option value="06:00 PM">06:00 PM</option>
-                            <option value="07:00 PM">07:00 PM</option>
-                            <option value="08:00 PM">08:00 PM</option>
-                            <option value="09:00 PM">09:00 PM</option>
-                            <option value="10:00 PM">10:00 PM</option>
-                        </select>
-                    </div>
-                </div>
+// Open Booking Modal from Service Buttons
+serviceButtons.forEach(btn => {
+    btn.addEventListener('click', (e) => {
+        const serviceName = btn.getAttribute('data-service');
+        bookingModal.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
 
-                <div class="form-group">
-                    <label class="form-label">Services Interested In (Select at least one)</label>
-                    <div class="checkbox-grid">
-                        <label class="checkbox-item">
-                            <input type="checkbox" name="services" value="AI Content Generation">
-                            <span class="checkbox-label">AI Content Generation</span>
-                        </label>
-                        <label class="checkbox-item">
-                            <input type="checkbox" name="services" value="Image Recognition">
-                            <span class="checkbox-label">Image Recognition</span>
-                        </label>
-                        <label class="checkbox-item">
-                            <input type="checkbox" name="services" value="Data Analytics">
-                            <span class="checkbox-label">Data Analytics</span>
-                        </label>
-                        <label class="checkbox-item">
-                            <input type="checkbox" name="services" value="Voice Synthesis">
-                            <span class="checkbox-label">Voice Synthesis</span>
-                        </label>
-                        <label class="checkbox-item">
-                            <input type="checkbox" name="services" value="Predictive AI">
-                            <span class="checkbox-label">Predictive AI</span>
-                        </label>
-                    </div>
-                </div>
+        // Pre-check the corresponding service checkbox
+        const checkboxes = document.querySelectorAll('input[name="services"]');
+        checkboxes.forEach(checkbox => {
+            if (checkbox.value === serviceName) {
+                checkbox.checked = true;
+            }
+        });
+    });
+});
 
-                <button type="submit" class="btn-primary" id="bookingSubmitBtn">
-                    Book Consultation
-                </button>
-            </form>
-        </div>
-    </div>
+// Close Booking Modal
+bookingModalClose?.addEventListener('click', () => {
+    bookingModal.style.display = 'none';
+    document.body.style.overflow = 'auto';
+});
 
-    <!-- ============================================================
-         SUCCESS MODAL
-         ============================================================ -->
-    <div class="modal-overlay" id="successModal" role="dialog" aria-modal="true" aria-labelledby="successTitle">
-        <div class="modal modal-success">
-            <div class="success-icon">
-                <svg width="64" height="64" viewBox="0 0 64 64" fill="none">
-                    <circle cx="32" cy="32" r="32" fill="#10B981" />
-                    <path d="M20 32L28 40L44 24" stroke="white" stroke-width="4" stroke-linecap="round"
-                        stroke-linejoin="round" />
-                </svg>
-            </div>
+// Set minimum date to today for booking
+const meetingDate = document.getElementById('meetingDate');
+if (meetingDate) {
+    const today = new Date().toISOString().split('T')[0];
+    meetingDate.setAttribute('min', today);
 
-            <h2 class="modal-title" id="successTitle">Booking Confirmed!</h2>
-            <p class="modal-subtitle">Thank you for choosing ShreeAI. We've received your consultation request and will
-                contact you shortly with meeting details.</p>
+    // Only allow weekends
+    meetingDate.addEventListener('input', function () {
+        const date = new Date(this.value);
+        const day = date.getDay();
+        if (day !== 0 && day !== 6) {
+            alert('Please select a weekend date (Saturday or Sunday)');
+            this.value = '';
+        }
+    });
+}
 
-            <button class="btn-primary" id="successBtn">
-                Done
-            </button>
-        </div>
-    </div>
+// Handle Booking Form Submission
+bookingForm?.addEventListener('submit', (e) => {
+    e.preventDefault();
 
-    <!-- ============================================================
-         MAIN CONTENT
-         ============================================================ -->
-    <main class="main">
+    // Validate at least one service is selected
+    const selectedServices = document.querySelectorAll('input[name="services"]:checked');
+    if (selectedServices.length === 0) {
+        alert('Please select at least one service');
+        return;
+    }
 
-        <!-- Hero Section -->
-        <section class="hero">
-            <div class="container">
-                <div class="hero-content">
-                    <h1 class="hero-title">
-                        Revolutionize Your Business with AI Solutions
-                    </h1>
-                    <p class="hero-subtitle">
-                        Harness the power of cutting-edge artificial intelligence to transform your workflow, enhance
-                        productivity, and drive innovation
-                    </p>
-                </div>
-            </div>
-        </section>
+    // Close booking modal
+    bookingModal.style.display = 'none';
 
-        <!-- Services Section -->
-        <section class="services">
-            <div class="container">
-                <div class="services-grid">
+    // Show success modal
+    successModal.style.display = 'flex';
 
-                    <!-- Service 1: AI Content Generation -->
-                    <article class="service-card">
-                        <div class="service-video-wrapper">
-                            <video class="service-video" loop playsinline preload="metadata">
-                                <source
-                                    src="video2.mp4"
-                                    type="video/mp4">
-                            </video>
-                            <div class="video-overlay">
-                                <button class="video-play-btn" aria-label="Play video">
-                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                                        <path d="M8 5v14l11-7z" />
-                                    </svg>
-                                </button>
-                            </div>
-                            <button class="video-sound-btn muted" aria-label="Toggle sound">
-                                <svg class="sound-on" width="20" height="20" viewBox="0 0 24 24" fill="none"
-                                    stroke="currentColor">
-                                    <path d="M11 5L6 9H2v6h4l5 4V5z" />
-                                    <path d="M15.54 8.46a5 5 0 010 7.07M19.07 4.93a10 10 0 010 14.14" />
-                                </svg>
-                                <svg class="sound-off" width="20" height="20" viewBox="0 0 24 24" fill="none"
-                                    stroke="currentColor" style="display: none;">
-                                    <path d="M11 5L6 9H2v6h4l5 4V5zM23 9l-6 6M17 9l6 6" />
-                                </svg>
-                            </button>
-                        </div>
-                        <div class="service-content">
-                            <h3 class="service-title">AI Content Generation</h3>
-                            <p class="service-description">Create high-quality content at scale with our advanced
-                                language models</p>
-                            <button class="btn-service" data-service="AI Content Generation">
-                                Try this Service
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                    <path d="M5 12h14M12 5l7 7-7 7" />
-                                </svg>
-                            </button>
-                        </div>
-                    </article>
+    // Reset form
+    bookingForm.reset();
+});
 
-                    <!-- Service 2: Image Recognition -->
-                    <article class="service-card">
-                        <div class="service-video-wrapper">
-                            <video class="service-video" loop muted playsinline preload="metadata">
-                                <source
-                                    src="video1.mp4"
-                                    type="video/mp4">
-                            </video>
-                            <div class="video-overlay">
-                                <button class="video-play-btn" aria-label="Play video">
-                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                                        <path d="M8 5v14l11-7z" />
-                                    </svg>
-                                </button>
-                            </div>
-                            <button class="video-sound-btn muted" aria-label="Toggle sound">
-                                <svg class="sound-on" width="20" height="20" viewBox="0 0 24 24" fill="none"
-                                    stroke="currentColor">
-                                    <path d="M11 5L6 9H2v6h4l5 4V5z" />
-                                    <path d="M15.54 8.46a5 5 0 010 7.07M19.07 4.93a10 10 0 010 14.14" />
-                                </svg>
-                                <svg class="sound-off" width="20" height="20" viewBox="0 0 24 24" fill="none"
-                                    stroke="currentColor" style="display: none;">
-                                    <path d="M11 5L6 9H2v6h4l5 4V5zM23 9l-6 6M17 9l6 6" />
-                                </svg>
-                            </button>
-                        </div>
-                        <div class="service-content">
-                            <h3 class="service-title">Image Recognition</h3>
-                            <p class="service-description">Analyze and classify images with unprecedented accuracy and
-                                speed</p>
-                            <button class="btn-service" data-service="Image Recognition">
-                                Try this Service
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                    <path d="M5 12h14M12 5l7 7-7 7" />
-                                </svg>
-                            </button>
-                        </div>
-                    </article>
+// Close Success Modal
+successBtn?.addEventListener('click', () => {
+    successModal.style.display = 'none';
+    document.body.style.overflow = 'auto';
+});
 
-                    <!-- Service 3: Data Analytics -->
-                    <article class="service-card">
-                        <div class="service-video-wrapper">
-                            <video class="service-video" loop muted playsinline preload="metadata">
-                                <source
-                                    src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4"
-                                    type="video/mp4">
-                            </video>
-                            <div class="video-overlay">
-                                <button class="video-play-btn" aria-label="Play video">
-                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                                        <path d="M8 5v14l11-7z" />
-                                    </svg>
-                                </button>
-                            </div>
-                            <button class="video-sound-btn muted" aria-label="Toggle sound">
-                                <svg class="sound-on" width="20" height="20" viewBox="0 0 24 24" fill="none"
-                                    stroke="currentColor">
-                                    <path d="M11 5L6 9H2v6h4l5 4V5z" />
-                                    <path d="M15.54 8.46a5 5 0 010 7.07M19.07 4.93a10 10 0 010 14.14" />
-                                </svg>
-                                <svg class="sound-off" width="20" height="20" viewBox="0 0 24 24" fill="none"
-                                    stroke="currentColor" style="display: none;">
-                                    <path d="M11 5L6 9H2v6h4l5 4V5zM23 9l-6 6M17 9l6 6" />
-                                </svg>
-                            </button>
-                        </div>
-                        <div class="service-content">
-                            <h3 class="service-title">Data Analytics</h3>
-                            <p class="service-description">Extract insights from complex datasets with intelligent
-                                automation</p>
-                            <button class="btn-service" data-service="Data Analytics">
-                                Try this Service
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                    <path d="M5 12h14M12 5l7 7-7 7" />
-                                </svg>
-                            </button>
-                        </div>
-                    </article>
+// Close modals on overlay click
+[signupModal, bookingModal, successModal].forEach(modal => {
+    modal?.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            modal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+    });
+});
 
-                    <!-- Service 4: Voice Synthesis -->
-                    <article class="service-card">
-                        <div class="service-video-wrapper">
-                            <video class="service-video" loop muted playsinline preload="metadata">
-                                <source
-                                    src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4"
-                                    type="video/mp4">
-                            </video>
-                            <div class="video-overlay">
-                                <button class="video-play-btn" aria-label="Play video">
-                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                                        <path d="M8 5v14l11-7z" />
-                                    </svg>
-                                </button>
-                            </div>
-                            <button class="video-sound-btn muted" aria-label="Toggle sound">
-                                <svg class="sound-on" width="20" height="20" viewBox="0 0 24 24" fill="none"
-                                    stroke="currentColor">
-                                    <path d="M11 5L6 9H2v6h4l5 4V5z" />
-                                    <path d="M15.54 8.46a5 5 0 010 7.07M19.07 4.93a10 10 0 010 14.14" />
-                                </svg>
-                                <svg class="sound-off" width="20" height="20" viewBox="0 0 24 24" fill="none"
-                                    stroke="currentColor" style="display: none;">
-                                    <path d="M11 5L6 9H2v6h4l5 4V5zM23 9l-6 6M17 9l6 6" />
-                                </svg>
-                            </button>
-                        </div>
-                        <div class="service-content">
-                            <h3 class="service-title">Voice Synthesis</h3>
-                            <p class="service-description">Transform text into natural-sounding speech in multiple
-                                languages</p>
-                            <button class="btn-service" data-service="Voice Synthesis">
-                                Try this Service
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                    <path d="M5 12h14M12 5l7 7-7 7" />
-                                </svg>
-                            </button>
-                        </div>
-                    </article>
+// Logo click - scroll to top
+logoBtn?.addEventListener('click', () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+});
 
-                    <!-- Service 5: Predictive AI -->
-                    <article class="service-card">
-                        <div class="service-video-wrapper">
-                            <video class="service-video" loop muted playsinline preload="metadata">
-                                <source
-                                    src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4"
-                                    type="video/mp4">
-                            </video>
-                            <div class="video-overlay">
-                                <button class="video-play-btn" aria-label="Play video">
-                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                                        <path d="M8 5v14l11-7z" />
-                                    </svg>
-                                </button>
-                            </div>
-                            <button class="video-sound-btn muted" aria-label="Toggle sound">
-                                <svg class="sound-on" width="20" height="20" viewBox="0 0 24 24" fill="none"
-                                    stroke="currentColor">
-                                    <path d="M11 5L6 9H2v6h4l5 4V5z" />
-                                    <path d="M15.54 8.46a5 5 0 010 7.07M19.07 4.93a10 10 0 010 14.14" />
-                                </svg>
-                                <svg class="sound-off" width="20" height="20" viewBox="0 0 24 24" fill="none"
-                                    stroke="currentColor" style="display: none;">
-                                    <path d="M11 5L6 9H2v6h4l5 4V5zM23 9l-6 6M17 9l6 6" />
-                                </svg>
-                            </button>
-                        </div>
-                        <div class="service-content">
-                            <h3 class="service-title">Predictive AI</h3>
-                            <p class="service-description">Forecast trends and outcomes with machine learning models</p>
-                            <button class="btn-service" data-service="Predictive AI">
-                                Try this Service
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                    <path d="M5 12h14M12 5l7 7-7 7" />
-                                </svg>
-                            </button>
-                        </div>
-                    </article>
-
-                </div>
-            </div>
-        </section>
-
-    </main>
-
-    <!-- ============================================================
-         FOOTER
-         ============================================================ -->
-    <footer class="footer">
-        <div class="container">
-            <p>&copy; 2025 ShreeAI. All rights reserved.</p>
-        </div>
-    </footer>
-
-    <!-- JavaScript -->
-    <script src="script.js"></script>
-
-</body>
-
-</html>
-
-
-
-
+// Check if user is already logged in
+window.addEventListener('DOMContentLoaded', () => {
+    const userName = localStorage.getItem('userName');
+    if (userName) {
+        signupBtn.style.display = 'none';
+        profileMenu.style.display = 'block';
+        document.getElementById('profileName').textContent = userName.split(' ')[0];
+        document.getElementById('profileInitial').textContent = userName.charAt(0).toUpperCase();
+    }
+});
